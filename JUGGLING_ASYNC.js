@@ -1,41 +1,42 @@
 /*
-Initial ugly solution that works. 
+This problem is the same as the previous problem (HTTP COLLECT) in that
+you need to use http.get(). However, this time you will be provided with
+three URLs as the first three command-line arguments.
 
+You must collect the complete content provided to you by each of the URLs
+and print it to the console (stdout). You don't need to print out the
+length, just the data as a String; one line per URL. The catch is that you
+must print them out in the same order as the URLs are provided to you as
+command-line arguments.
 */
 
-var http = require('http')
-var bl = require('bl')
 
-http.get(process.argv[2], function (response) { // call back function to print data
-  response.pipe(bl(function (err, data) { // stores all data emitted by 'data' events in a pipe
-    if (err) { // error handling like a boss
-      console.error
-    } else {
-      data = data.toString() // coverting input stream to readable string
-      // console.log(data.length)                  // prints out the number of characters in the data
-      console.log(data)
-      http.get(process.argv[3], function (response) { // call back function to print data
-        response.pipe(bl(function (err, data) { // stores all data emitted by 'data' events in a pipe
-          if (err) { // error handling like a boss
-            console.error
-          } else {
-            data = data.toString() // coverting input stream to readable string
-            // console.log(data.length)                  // prints out the number of characters in the data
-            console.log(data)
-            http.get(process.argv[4], function (response) { // call back function to print data
-              response.pipe(bl(function (err, data) { // stores all data emitted by 'data' events in a pipe
-                if (err) {
-                  console.error
-                } else {
-                  data = data.toString() // coverting input stream to readable string
+var http = require('http') // import http module
+var bl = require('bl')     // import bl module
+var results = []           // create empty array to store data in
+var count = 0              // initialize count = 0
 
-                  console.log(data) // printing it all out to the console
-                }
-              }))
-            })
-          }
-        }))
-      })
-    }
-  }))
-})
+function printData () {    // function to print data stored in the results array
+  for (var i = 0; i < 3; i++)
+    console.log(results[i])
+}
+
+function httpGet (index) { // wrpper function to store the http get method
+  http.get(process.argv[2 + index], function (response) { // http GET
+    response.pipe(bl(function (err, data) {               // store incoming data to pipeline
+      if (err){
+        return console.error                              // error handling
+      } else {
+
+      results[index] = data.toString()                    // store data of current GET into results array
+      count++                                             // increment count of the number of elements in results array
+
+      if (count == 3)                                     // check if 'results' array has three elements
+        printResults()                                    // print the contents of 'results' array
+      }}))
+  })
+}
+
+for (var i = 0; i < 3; i++) {                               // loop to get data from the 3 URL's provided
+  httpGet(i)
+}
