@@ -7,6 +7,6 @@ var server = http.createServer(function (request, response) {
     request.pipe(map(function (chunk) {
       return chunk.toString().toUpperCase()
     })).pipe(response)
-  } return response.end('Only POST method Accepted')})
+  }else {return response.end('Only POST method Accepted')}})
 
 server.listen(port)
